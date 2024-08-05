@@ -47,6 +47,11 @@ export const GlobalStyle = createGlobalStyle`
     border-collapse: collapse;
     border-spacing: 0;
   }
+
+  a{
+    text-decoration: none;
+    color:rgb(15, 127, 244)
+  }
 `;
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
