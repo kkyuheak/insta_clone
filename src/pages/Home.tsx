@@ -4,6 +4,7 @@ import Button from "../components/Button";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -34,17 +35,16 @@ const RightSection = styled.div`
   border-radius: 5px;
 `;
 
-const HomeLogo = styled.p`
+export const HomeLogo = styled.p`
   display: block;
   font-size: 90px;
   width: 100%;
-  /* height: 40px; */
   font-family: "Grey Qo", cursive;
   text-align: center;
   margin: 30px 0;
 `;
 
-const Form = styled.form`
+export const Form = styled.form`
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -54,7 +54,7 @@ const Form = styled.form`
   }
 `;
 
-const Line = styled.p`
+export const Line = styled.p`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -79,7 +79,7 @@ const Line = styled.p`
   }
 `;
 
-const LoginIcons = styled.div`
+export const LoginIcons = styled.div`
   width: 100%;
   height: 60px;
   margin-top: 15px;
@@ -89,12 +89,12 @@ const LoginIcons = styled.div`
   gap: 20px;
 `;
 
-const Icon = styled.img`
+export const Icon = styled.img`
   width: 40px;
   cursor: pointer;
 `;
 
-const NoAccount = styled.div`
+export const NoAccount = styled.div`
   margin-top: 20px;
   display: flex;
   justify-content: center;
@@ -126,8 +126,13 @@ const imgSrc = [
   "/images/main_phone_img_3.png",
 ];
 
+export interface IFormValue {
+  Id: string;
+}
+
 const Home = () => {
   const [visibleImg, setVisibleImg] = useState(0);
+  const { register, handleSubmit } = useForm<IFormValue>();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -136,6 +141,10 @@ const Home = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  const onSubmit: SubmitHandler<IFormValue> = (data) => {
+    console.log(data);
+  };
 
   return (
     <Wrapper>
@@ -159,9 +168,16 @@ const Home = () => {
       </LeftSection>
       <RightSection>
         <HomeLogo>instagram</HomeLogo>
-        <Form>
-          <Input type="text" placeholder="아이디(이메일)" top />
-          <Input type="password" placeholder="비밀번호" bottom />
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <Input
+            type="text"
+            placeholder="아이디(이메일)"
+            top
+            register={register}
+            label="Id"
+            required
+          />
+          {/* <Input type="password" placeholder="비밀번호" bottom /> */}
           <Button width="330px">로그인</Button>
         </Form>
         <Line>또는</Line>
