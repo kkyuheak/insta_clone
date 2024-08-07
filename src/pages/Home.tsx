@@ -128,6 +128,10 @@ const imgSrc = [
 
 export interface IFormValue {
   Id: string;
+  password: number;
+  email: string;
+  nickname: string;
+  checkPassword: number;
 }
 
 const Home = () => {
@@ -177,7 +181,14 @@ const Home = () => {
             label="Id"
             required
           />
-          {/* <Input type="password" placeholder="비밀번호" bottom /> */}
+          <Input
+            type="password"
+            placeholder="비밀번호"
+            register={register}
+            label="password"
+            bottom
+            required
+          />
           <Button width="330px">로그인</Button>
         </Form>
         <Line>또는</Line>
