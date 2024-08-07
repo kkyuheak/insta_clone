@@ -12,6 +12,7 @@ import Input from "../components/Input";
 import Button from "../components/Button";
 import { Link } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
+import supabase from "../supabaseClient";
 
 const Wrapper = styled.div``;
 
@@ -27,8 +28,24 @@ const SignUpForm = styled.div`
 const SignUp = () => {
   const { register, handleSubmit } = useForm<IFormValue>();
 
-  const onSubmit: SubmitHandler<IFormValue> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<IFormValue> = async (inputData) => {
+    console.log(inputData.password);
+
+    const { data, error } = await supabase.auth.signUp({
+      email: inputData.email,
+      password: inputData.password + "",
+    });
+
+    console.log(data, error);
+
+    const userData = await supabase.from("userinfo").insert({
+      id: "asd",
+      nickname: inputData.nickname,
+      email: data.user?.email,
+      hasdPW: inputData.password,
+    });
+
+    console.log("userData :", userData);
   };
 
   return (
@@ -64,14 +81,14 @@ const SignUp = () => {
             required
             label="password"
           />
-          <Input
+          {/* <Input
             type="password"
             placeholder="비밀번호를 한번 더 입력해주세요"
             bottom
             register={register}
             required
             label="checkPassword"
-          />
+          /> */}
           <Button width="340px">가입하기</Button>
         </Form>
         <NoAccount style={{ marginTop: "50px" }}>
