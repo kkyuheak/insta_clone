@@ -13,6 +13,7 @@ import Button from "../components/Button";
 import { Link } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import supabase from "../supabaseClient";
+import bcrypt from "bcryptjs";
 
 const Wrapper = styled.div``;
 
@@ -26,27 +27,37 @@ const SignUpForm = styled.div`
 `;
 
 const SignUp = () => {
-  const { register, handleSubmit } = useForm<IFormValue>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormValue>();
 
   const onSubmit: SubmitHandler<IFormValue> = async (inputData) => {
     console.log(inputData.password);
 
+    const hashedPassword = await bcrypt.hash(inputData.password + "", 12);
+    console.log(hashedPassword);
+
     const { data, error } = await supabase.auth.signUp({
       email: inputData.email,
-      password: inputData.password + "",
+      password: hashedPassword,
     });
 
     console.log(data, error);
 
     const userData = await supabase.from("userinfo").insert({
-      id: "asd",
+      id: data.user?.id,
       nickname: inputData.nickname,
       email: data.user?.email,
-      hasdPW: inputData.password,
+      hashPW: hashedPassword,
     });
 
     console.log("userData :", userData);
   };
+
+  console.log(Object.keys(errors)[0]);
+  console.log(errors);
 
   return (
     <Wrapper>
@@ -58,6 +69,7 @@ const SignUp = () => {
         </LoginIcons>
         <Line style={{ margin: "30px 0" }}>또는</Line>
         <Form onSubmit={handleSubmit(onSubmit)}>
+          {errors.email && <p>{errors.email.type}</p>}
           <Input
             type="e-mail"
             placeholder="이메일 주소"
@@ -65,6 +77,7 @@ const SignUp = () => {
             register={register}
             required
             label="email"
+            pattern={/^[^\s@]+@[^\s@]+\.[^\s@]+$/}
           />
           <Input
             type="text"
@@ -80,15 +93,19 @@ const SignUp = () => {
             register={register}
             required
             label="password"
+            min={8}
+            pattern={
+              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
+            }
           />
-          {/* <Input
+          <Input
             type="password"
             placeholder="비밀번호를 한번 더 입력해주세요"
             bottom
             register={register}
             required
             label="checkPassword"
-          /> */}
+          />
           <Button width="340px">가입하기</Button>
         </Form>
         <NoAccount style={{ marginTop: "50px" }}>

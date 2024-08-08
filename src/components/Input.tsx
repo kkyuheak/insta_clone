@@ -1,9 +1,8 @@
-import { motion } from "framer-motion";
 import { Path, UseFormRegister } from "react-hook-form";
 import styled from "styled-components";
 import { IFormValue } from "../pages/Home";
 
-const SInput = styled(motion.input)<{
+const SInput = styled.input<{
   $top: boolean;
   $bottom: boolean;
   $middle: boolean;
@@ -47,6 +46,9 @@ interface IInput {
   register: UseFormRegister<IFormValue>;
   label: Path<IFormValue>;
   required?: boolean;
+  min?: number;
+  max?: number;
+  pattern?: RegExp;
 }
 
 const Input = ({
@@ -58,6 +60,9 @@ const Input = ({
   register,
   label,
   required,
+  min,
+  max,
+  pattern,
 }: IInput) => {
   return (
     <SInput
@@ -66,7 +71,12 @@ const Input = ({
       $top={top}
       $bottom={bottom}
       $middle={middle}
-      {...register(label, { required })}
+      {...register(label, {
+        required,
+        minLength: min,
+        maxLength: max,
+        pattern: pattern,
+      })}
     />
   );
 };
