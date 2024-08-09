@@ -26,6 +26,13 @@ const SignUpForm = styled.div`
   border-radius: 5px;
 `;
 
+const ErrorMessage = styled.p`
+  font-size: 17px;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #d10000;
+`;
+
 const SignUp = () => {
   const {
     register,
@@ -34,6 +41,7 @@ const SignUp = () => {
   } = useForm<IFormValue>();
 
   const onSubmit: SubmitHandler<IFormValue> = async (inputData) => {
+    if (inputData.password !== inputData.checkPassword) return;
     console.log(inputData.password);
 
     const hashedPassword = await bcrypt.hash(inputData.password + "", 12);
@@ -56,7 +64,7 @@ const SignUp = () => {
     console.log("userData :", userData);
   };
 
-  console.log(Object.keys(errors)[0]);
+  console.log(Object.values(errors)[0]);
   console.log(errors);
 
   return (
@@ -69,7 +77,12 @@ const SignUp = () => {
         </LoginIcons>
         <Line style={{ margin: "30px 0" }}>또는</Line>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          {errors.email && <p>{errors.email.type}</p>}
+          {/* {errors.email && <p>{errors.email.type}</p>} */}
+
+          {errors && (
+            <ErrorMessage>{Object.values(errors)[0]?.message}</ErrorMessage>
+          )}
+
           <Input
             type="e-mail"
             placeholder="이메일 주소"
@@ -78,6 +91,7 @@ const SignUp = () => {
             required
             label="email"
             pattern={/^[^\s@]+@[^\s@]+\.[^\s@]+$/}
+            isError={errors.email ? true : false}
           />
           <Input
             type="text"
@@ -86,6 +100,7 @@ const SignUp = () => {
             register={register}
             required
             label="nickname"
+            isError={errors.nickname ? true : false}
           />
           <Input
             type="password"
@@ -97,6 +112,7 @@ const SignUp = () => {
             pattern={
               /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
             }
+            isError={errors.password ? true : false}
           />
           <Input
             type="password"
