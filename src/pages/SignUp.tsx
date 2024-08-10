@@ -8,7 +8,6 @@ import {
   LoginIcons,
   NoAccount,
 } from "./Home";
-import Input from "../components/Input";
 import Button from "../components/Button";
 import { Link } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -33,15 +32,48 @@ const ErrorMessage = styled.p`
   color: #d10000;
 `;
 
+const SInput = styled.input<{
+  $top?: boolean;
+  $bottom?: boolean;
+  $isError?: boolean;
+}>`
+  width: 320px;
+  height: 40px;
+  border: ${(props) =>
+    props.$isError ? "1px solid #db0000" : "1px solid #b3b3b3"};
+  padding: 5px 10px;
+  outline-color: ${(props) => (props.$isError ? "#db0000" : "#8a8a8a")};
+  outline-width: thin;
+  font-size: 17px;
+
+  border-radius: ${(props) => (props.$top ? "5px 5px 0 0" : "")};
+  border-radius: ${(props) => (props.$bottom ? "0 0 5px 5px" : "")};
+
+  &::placeholder {
+    font-size: 14px;
+  }
+
+  &:focus {
+    &::placeholder {
+      font-size: 10px;
+      position: absolute;
+      top: 5px;
+      transition: all 0.3s;
+    }
+  }
+`;
+
 const SignUp = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
   } = useForm<IFormValue>();
 
   const onSubmit: SubmitHandler<IFormValue> = async (inputData) => {
     if (inputData.password !== inputData.checkPassword) return;
+
     console.log(inputData.password);
 
     const hashedPassword = await bcrypt.hash(inputData.password + "", 12);
@@ -64,7 +96,6 @@ const SignUp = () => {
     console.log("userData :", userData);
   };
 
-  console.log(Object.values(errors)[0]);
   console.log(errors);
 
   return (
@@ -77,50 +108,61 @@ const SignUp = () => {
         </LoginIcons>
         <Line style={{ margin: "30px 0" }}>또는</Line>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          {/* {errors.email && <p>{errors.email.type}</p>} */}
-
           {errors && (
             <ErrorMessage>{Object.values(errors)[0]?.message}</ErrorMessage>
           )}
 
-          <Input
-            type="e-mail"
+          <SInput
+            $top
+            type="text"
             placeholder="이메일 주소"
-            top
-            register={register}
-            required
-            label="email"
-            pattern={/^[^\s@]+@[^\s@]+\.[^\s@]+$/}
-            isError={errors.email ? true : false}
+            {...register("email", {
+              required: "이메일은 필수 입력입니다.",
+              minLength: {
+                value: 6,
+                message: "이메일은 최소 6글자 입니다.",
+              },
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "이메일 형식으로 작성해주세요",
+              },
+            })}
+            $isError={errors.email ? true : false}
           />
-          <Input
+          <SInput
             type="text"
             placeholder="닉네임"
-            middle
-            register={register}
-            required
-            label="nickname"
-            isError={errors.nickname ? true : false}
+            {...register("nickname", {
+              required: "닉네임은 필수 입력입니다.",
+            })}
+            $isError={errors.nickname ? true : false}
           />
-          <Input
+          <SInput
             type="password"
             placeholder="비밀번호"
-            register={register}
-            required
-            label="password"
-            min={8}
-            pattern={
-              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/
-            }
-            isError={errors.password ? true : false}
+            {...register("password", {
+              required: "비밀번호는 필수 입력입니다.",
+              minLength: { value: 8, message: "비밀번호는 최소 8글자 입니다." },
+              pattern:
+                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+            })}
+            $isError={errors.password ? true : false}
           />
-          <Input
+          <SInput
+            $bottom
             type="password"
             placeholder="비밀번호를 한번 더 입력해주세요"
-            bottom
-            register={register}
-            required
-            label="checkPassword"
+            {...register("checkPassword", {
+              required: "비밀번호를 한번 더 입력해주세요",
+              validate: {
+                check: (val) => {
+                  if (getValues("password") !== val) {
+                    return "비밀번호가 일치하지 않습니다.";
+                  }
+                },
+              },
+            })}
+            $isError={errors.checkPassword ? true : false}
           />
           <Button width="340px">가입하기</Button>
         </Form>
