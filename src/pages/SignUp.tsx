@@ -80,6 +80,11 @@ const SignUp = () => {
     const { data, error } = await supabase.auth.signUp({
       email: inputData.email,
       password: inputData.password + "",
+      options: {
+        data: {
+          nickname: inputData.nickname,
+        },
+      },
     });
 
     console.log(data, error);
