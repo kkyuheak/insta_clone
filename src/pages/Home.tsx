@@ -1,10 +1,12 @@
 import styled from "styled-components";
-import Input from "../components/Input";
 import Button from "../components/Button";
 import { AnimatePresence, motion, Variants } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { ErrorMessage, SInput } from "./SignUp";
+import bcrypt from "bcryptjs";
+import supabase from "../supabaseClient";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -136,7 +138,11 @@ export interface IFormValue {
 
 const Home = () => {
   const [visibleImg, setVisibleImg] = useState(0);
-  const { register, handleSubmit } = useForm<IFormValue>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormValue>();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -146,8 +152,35 @@ const Home = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const onSubmit: SubmitHandler<IFormValue> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<IFormValue> = async (inputData) => {
+    const hashedPassword = await bcrypt.hash(inputData.password + "", 12);
+    console.log(hashedPassword);
+
+    // const { data: user, error } = await supabase
+    //   .from("userinfo")
+    //   .select("*")
+    //   .eq("email", inputData.email)
+    //   .single();
+    // console.log(user, error);
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: inputData.email,
+      password: inputData.password + "",
+    });
+
+    console.log(data, error);
+
+    // if (user) {
+    //   const match = await bcrypt.compare(inputData.password + "", user.hashPW);
+    //   console.log(match);
+
+    //   if(match){
+    //     const { data, error } = await supabase.auth.signInWithPassword({
+    //       email: inputData.email,
+    //       password: 'example-password',
+    //     })
+    //   }
+    // }
   };
 
   return (
@@ -173,21 +206,40 @@ const Home = () => {
       <RightSection>
         <HomeLogo>instagram</HomeLogo>
         <Form onSubmit={handleSubmit(onSubmit)}>
-          <Input
+          {errors && (
+            <ErrorMessage>{Object.values(errors)[0]?.message}</ErrorMessage>
+          )}
+          <SInput
             type="text"
             placeholder="아이디(이메일)"
-            top
-            register={register}
-            label="Id"
-            required
+            $top
+            {...register("email", {
+              required: "이메일은 필수 입력입니다.",
+              minLength: {
+                value: 6,
+                message: "이메일은 최소 6글자 입니다.",
+              },
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "이메일 형식으로 작성해주세요",
+              },
+            })}
+            $isError={errors.email ? true : false}
           />
-          <Input
+          <SInput
             type="password"
             placeholder="비밀번호"
-            register={register}
-            label="password"
-            bottom
-            required
+            $bottom
+            {...register("password", {
+              required: "비밀번호는 필수 입력입니다.",
+              minLength: { value: 8, message: "비밀번호는 최소 8글자 입니다." },
+              pattern: {
+                value:
+                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                message: "비밀번호는 대소문자, 숫자, 기호를 꼭 입력해주세요",
+              },
+            })}
+            $isError={errors.password ? true : false}
           />
           <Button width="330px">로그인</Button>
         </Form>

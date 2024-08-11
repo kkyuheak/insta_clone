@@ -9,10 +9,9 @@ import {
   NoAccount,
 } from "./Home";
 import Button from "../components/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import supabase from "../supabaseClient";
-import bcrypt from "bcryptjs";
 
 const Wrapper = styled.div``;
 
@@ -25,14 +24,14 @@ const SignUpForm = styled.div`
   border-radius: 5px;
 `;
 
-const ErrorMessage = styled.p`
+export const ErrorMessage = styled.p`
   font-size: 17px;
   text-align: center;
   margin-bottom: 10px;
   color: #d10000;
 `;
 
-const SInput = styled.input<{
+export const SInput = styled.input<{
   $top?: boolean;
   $bottom?: boolean;
   $isError?: boolean;
@@ -64,6 +63,8 @@ const SInput = styled.input<{
 `;
 
 const SignUp = () => {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -76,24 +77,16 @@ const SignUp = () => {
 
     console.log(inputData.password);
 
-    const hashedPassword = await bcrypt.hash(inputData.password + "", 12);
-    console.log(hashedPassword);
-
     const { data, error } = await supabase.auth.signUp({
       email: inputData.email,
-      password: hashedPassword,
+      password: inputData.password + "",
     });
 
     console.log(data, error);
 
-    const userData = await supabase.from("userinfo").insert({
-      id: data.user?.id,
-      nickname: inputData.nickname,
-      email: data.user?.email,
-      hashPW: hashedPassword,
-    });
+    if (error) return;
 
-    console.log("userData :", userData);
+    navigate("/");
   };
 
   console.log(errors);
@@ -143,8 +136,11 @@ const SignUp = () => {
             {...register("password", {
               required: "비밀번호는 필수 입력입니다.",
               minLength: { value: 8, message: "비밀번호는 최소 8글자 입니다." },
-              pattern:
-                /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+              pattern: {
+                value:
+                  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$/,
+                message: "비밀번호는 대소문자, 숫자, 기호를 꼭 입력해주세요",
+              },
             })}
             $isError={errors.password ? true : false}
           />
