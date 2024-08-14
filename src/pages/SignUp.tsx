@@ -7,7 +7,7 @@ import {
   Line,
   LoginIcons,
   NoAccount,
-} from "./Home";
+} from "./LoginPage";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
