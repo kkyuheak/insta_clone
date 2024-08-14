@@ -12,6 +12,7 @@ import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import supabase from "../supabaseClient";
+import { useState } from "react";
 
 const Wrapper = styled.div``;
 
@@ -65,6 +66,8 @@ export const SInput = styled.input<{
 const SignUp = () => {
   const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -73,25 +76,31 @@ const SignUp = () => {
   } = useForm<IFormValue>();
 
   const onSubmit: SubmitHandler<IFormValue> = async (inputData) => {
-    if (inputData.password !== inputData.checkPassword) return;
+    try {
+      setLoading(true);
+      if (inputData.password !== inputData.checkPassword) return;
+      console.log(inputData.password);
 
-    console.log(inputData.password);
-
-    const { data, error } = await supabase.auth.signUp({
-      email: inputData.email,
-      password: inputData.password + "",
-      options: {
-        data: {
-          nickname: inputData.nickname,
+      const { data, error } = await supabase.auth.signUp({
+        email: inputData.email,
+        password: inputData.password + "",
+        options: {
+          data: {
+            nickname: inputData.nickname,
+          },
         },
-      },
-    });
+      });
 
-    console.log(data, error);
+      console.log(data, error);
 
-    if (error) return;
+      if (error) return;
 
-    navigate("/");
+      navigate("/");
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   console.log(errors);
@@ -165,7 +174,9 @@ const SignUp = () => {
             })}
             $isError={errors.checkPassword ? true : false}
           />
-          <Button width="340px">가입하기</Button>
+          <Button width="340px" disabled={loading}>
+            {loading ? "로딩중 .." : "가입하기"}
+          </Button>
         </Form>
         <NoAccount style={{ marginTop: "50px" }}>
           <p>계정이 있으신가요 ?</p>
