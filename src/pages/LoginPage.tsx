@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { ErrorMessage, SInput } from "./SignUp";
 import supabase from "../supabaseClient";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { UserAtom } from "../atom";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -136,6 +138,10 @@ export interface IFormValue {
 }
 
 const LoginPage = () => {
+  const setUserAtom = useSetRecoilState(UserAtom);
+  const userinfo = useRecoilValue(UserAtom);
+  console.log(userinfo);
+
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>();
   const [visibleImg, setVisibleImg] = useState(0);
@@ -163,12 +169,22 @@ const LoginPage = () => {
 
       console.log(data.user, error?.message);
 
+      if (data.user) {
+        const { nickname, email } = data.user.user_metadata;
+        setUserAtom({
+          nickname,
+          email,
+        });
+      }
+
       if (error) {
         if (error.message === "Invalid login credentials") {
           setLoginError("잘못된 이메일 또는 비밀번호입니다.");
         }
         return;
       }
+
+      console.log(userinfo);
     } catch (err) {
       console.error(err);
     } finally {
