@@ -2,6 +2,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
+import ProtectRoute from "./components/ProtectRoute";
+
+const userinfo = sessionStorage.getItem("user");
 
 const router = createBrowserRouter([
   {
@@ -10,11 +13,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/login",
-    element: <LoginPage />,
+    element: (
+      <ProtectRoute user={userinfo}>
+        <LoginPage />
+      </ProtectRoute>
+    ),
   },
   {
     path: "/signup",
-    element: <SignUp />,
+    element: (
+      <ProtectRoute user={userinfo}>
+        <SignUp />
+      </ProtectRoute>
+    ),
   },
 ]);
 
