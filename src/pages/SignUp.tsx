@@ -67,6 +67,7 @@ const SignUp = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(false);
+  const [signInError, setSignInError] = useState<string | null>();
 
   const {
     register,
@@ -81,6 +82,22 @@ const SignUp = () => {
       if (inputData.password !== inputData.checkPassword) return;
       console.log(inputData.password);
 
+      const { data: db, error: dbError } = await supabase
+        .from("user")
+        .select("nickname");
+
+      console.log("db: ", db, dbError);
+
+      if (db) {
+        const isNickNameExists = db.some(
+          (item) => item.nickname === inputData.nickname
+        );
+        if (isNickNameExists) {
+          setSignInError("해당 닉네임이 존재합니다.");
+          return;
+        }
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email: inputData.email,
         password: inputData.password + "",
@@ -93,17 +110,28 @@ const SignUp = () => {
 
       console.log(data, error);
 
-      if (error) return;
+      if (error) {
+        if (error) {
+          if (error.message === "User already registered") {
+            setSignInError("해당 이메일은 이미 가입한 유저입니다.");
+          } else {
+            setSignInError(
+              "회원가입 중 오류가 발생했습니다. 다시 시도해주세요."
+            );
+          }
+          setLoading(false);
+          return;
+        }
+        return;
+      }
 
-      navigate("/");
+      navigate("/login");
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
-
-  console.log(errors);
 
   return (
     <Wrapper>
@@ -118,6 +146,7 @@ const SignUp = () => {
           {errors && (
             <ErrorMessage>{Object.values(errors)[0]?.message}</ErrorMessage>
           )}
+          {signInError && <ErrorMessage>{signInError}</ErrorMessage>}
 
           <SInput
             $top
@@ -180,7 +209,7 @@ const SignUp = () => {
         </Form>
         <NoAccount style={{ marginTop: "50px" }}>
           <p>계정이 있으신가요 ?</p>
-          <Link to={"/"}>로그인</Link>
+          <Link to={"/login"}>로그인</Link>
         </NoAccount>
       </SignUpForm>
     </Wrapper>

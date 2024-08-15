@@ -167,6 +167,7 @@ const LoginPage = () => {
         if (error.message === "Invalid login credentials") {
           setLoginError("잘못된 이메일 또는 비밀번호입니다.");
         }
+        return;
       }
     } catch (err) {
       console.error(err);
