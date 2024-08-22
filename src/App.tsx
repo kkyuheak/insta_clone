@@ -9,7 +9,7 @@ const userinfo = sessionStorage.getItem("user");
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: userinfo ? <Home /> : <LoginPage />,
   },
   {
     path: "/login",

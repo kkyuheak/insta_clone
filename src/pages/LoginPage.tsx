@@ -138,6 +138,8 @@ export interface IFormValue {
 }
 
 const LoginPage = () => {
+  // const navigate = useNavigate();
+
   const setUserAtom = useSetRecoilState(UserAtom);
   const userinfo = useRecoilValue(UserAtom);
   console.log(userinfo);
@@ -180,9 +182,13 @@ const LoginPage = () => {
       if (error) {
         if (error.message === "Invalid login credentials") {
           setLoginError("잘못된 이메일 또는 비밀번호입니다.");
+        } else {
+          setLoginError("로그인 중 오류가 생겼습니다.");
         }
         return;
       }
+
+      window.location.reload();
 
       console.log(userinfo);
     } catch (err) {
