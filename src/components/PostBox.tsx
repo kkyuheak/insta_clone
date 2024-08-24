@@ -4,7 +4,6 @@ import { HiOutlineShare } from "react-icons/hi2";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 
 const Wrapper = styled.article`
-  /* background-color: #dedede; */
   margin: 0 auto;
   width: 470px;
   height: 820px;
