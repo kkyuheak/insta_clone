@@ -13,6 +13,7 @@ const Wrapper = styled.nav`
   padding: 10px;
   border-right: 1px solid #d0d0d0;
   position: fixed;
+  background-color: #fff;
 `;
 
 const TopItem = styled.div``;
