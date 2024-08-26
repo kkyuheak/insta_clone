@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useState } from "react";
+import { ChangeHandler, SubmitHandler, useForm } from "react-hook-form";
 import styled from "styled-components";
 import Button from "../components/Button";
+import { useRecoilValue } from "recoil";
+import { UserAtom } from "../atom";
+import supabase from "../supabaseClient";
 
 const Wrapper = styled.form`
   max-width: 1200px;
@@ -82,25 +85,44 @@ const Text = styled.textarea`
 
 interface IFormInput {
   images: FileList;
+  description: string;
 }
 
 const Upload = () => {
+  const userInfo = useRecoilValue(UserAtom);
+  console.log(userInfo);
+
   const { register, handleSubmit } = useForm<IFormInput>();
   const [imgPreviews, setImgPreviews] = useState<string[]>([]);
 
-  const onSubmit: SubmitHandler<IFormInput> = (data) => {
-    console.log(data);
-    console.log(imgPreviews);
+  const onSubmit: SubmitHandler<IFormInput> = async (data) => {
+    console.log(JSON.stringify(imgPreviews));
+    console.log(data.description);
+    console.log(userInfo);
+    try {
+      const { error } = await supabase.from("Posts").insert({
+        image_URL: JSON.stringify(imgPreviews),
+        description: data.description,
+        nickname: userInfo.nickname,
+      });
+      if (error) {
+        console.log(error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+  const handleChange: ChangeHandler = (e) => {
+    console.log(e.target.files);
+    const files: FileList = e.target.files;
     if (files) {
-      const imagePreviews = Array.from(files).map((file) => {
-        return URL.createObjectURL(file);
-      });
+      const imagePreviews = Array.from(files).map((file) =>
+        URL.createObjectURL(file)
+      );
       setImgPreviews(imagePreviews);
     }
+    return e.target.files;
   };
 
   return (
@@ -111,8 +133,7 @@ const Upload = () => {
         id="img"
         type="file"
         accept=".png, .jpeg, .jpg"
-        {...register("images")}
-        onChange={handleChange}
+        {...register("images", { onChange: handleChange })}
         multiple
       />
       <PrevImages>
@@ -123,6 +144,7 @@ const Upload = () => {
       <Text
         placeholder="문구를 작성하거나 설명을 추가하세요 (최대 400자)"
         maxLength={400}
+        {...register("description")}
       ></Text>
       <Button width="120px">등록하기</Button>
     </Wrapper>
