@@ -5,6 +5,8 @@ import Button from "../components/Button";
 import { useRecoilValue } from "recoil";
 import { UserAtom } from "../atom";
 import supabase from "../supabaseClient";
+import { motion, Variants } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.form`
   max-width: 1200px;
@@ -13,6 +15,26 @@ const Wrapper = styled.form`
   padding: 20px;
   border-radius: 10px;
   box-shadow: 1px 0px 100px rgb(180, 180, 180);
+`;
+
+const Loading = styled.div`
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const LoadingCircle = styled(motion.div)`
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 8px solid #fff;
+  border-top: 8px solid #595959;
 `;
 
 const Title = styled.h1`
@@ -69,10 +91,11 @@ const PrevImg = styled.div<{ $src: string }>`
   box-shadow: 1px 0px 10px rgb(180, 180, 180);
 `;
 
-const Text = styled.textarea`
+const Text = styled.textarea<{ $error: boolean }>`
   display: block;
   margin-top: 20px;
-  border: 1px solid #cacaca;
+  border: ${(props) =>
+    props.$error ? "2px solid #db0000" : "1px solid #cacaca"};
   border-radius: 5px;
   font-size: 16px;
   width: 100%;
@@ -81,6 +104,10 @@ const Text = styled.textarea`
   padding: 10px;
   resize: none;
   font-family: "Noto Serif KR", serif;
+
+  &::placeholder {
+    color: ${(props) => (props.$error ? "#db0000" : "")};
+  }
 `;
 
 interface IFormInput {
@@ -88,28 +115,54 @@ interface IFormInput {
   description: string;
 }
 
-const Upload = () => {
-  const userInfo = useRecoilValue(UserAtom);
-  console.log(userInfo);
+// loading animation
+const loadingVariants: Variants = {
+  initial: {
+    rotate: 0,
+  },
+  animate: {
+    rotate: 360,
+    transition: { ease: "linear", duration: 1, repeat: Infinity },
+  },
+};
 
-  const { register, handleSubmit } = useForm<IFormInput>();
+const Upload = () => {
+  const navigate = useNavigate();
+  const userInfo = useRecoilValue(UserAtom);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors: textError },
+  } = useForm<IFormInput>();
+  // textError 핸들링
+  const desError = textError.description?.message;
+
+  // img 경로 저장
   const [imgPreviews, setImgPreviews] = useState<string[]>([]);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
     console.log(JSON.stringify(imgPreviews));
     console.log(data.description);
     console.log(userInfo);
     try {
+      setIsLoading(true);
       const { error } = await supabase.from("Posts").insert({
         image_URL: JSON.stringify(imgPreviews),
         description: data.description,
         nickname: userInfo.nickname,
       });
+      navigate("/");
+
       if (error) {
         console.log(error);
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -127,6 +180,15 @@ const Upload = () => {
 
   return (
     <Wrapper onSubmit={handleSubmit(onSubmit)}>
+      {isLoading ? (
+        <Loading>
+          <LoadingCircle
+            variants={loadingVariants}
+            initial="initial"
+            animate="animate"
+          />
+        </Loading>
+      ) : null}
       <Title>새 게시물 만들기</Title>
       <Label htmlFor="img">사진 추가</Label>
       <Input
@@ -142,9 +204,16 @@ const Upload = () => {
         })}
       </PrevImages>
       <Text
-        placeholder="문구를 작성하거나 설명을 추가하세요 (최대 400자)"
+        placeholder={
+          desError
+            ? desError
+            : "문구를 작성하거나 설명을 추가하세요 (최대 400자)"
+        }
         maxLength={400}
-        {...register("description")}
+        {...register("description", {
+          required: "필수로 입력해야 합니다!",
+        })}
+        $error={desError ? true : false}
       ></Text>
       <Button width="120px">등록하기</Button>
     </Wrapper>
