@@ -60,8 +60,12 @@ const PostImages = styled.div`
   margin-top: 11px;
 `;
 
-const PostImg = styled.div`
-  background-color: #b6ffb9;
+const PostImg = styled.div<{ $src: string }>`
+  background-color: #fff;
+  background-image: url(${(props) => props.$src});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
   width: 100%;
   height: 585px;
   border-radius: 5px;
@@ -129,9 +133,13 @@ const PostBox = () => {
           <MdMoreHoriz size={30} />
         </PostMenu>
       </PostHeader>
+
+      {/* 사진 */}
       <PostImages>
-        <PostImg />
+        <PostImg $src="blob:http://localhost:5173/16c67ff4-0522-4460-9448-04073c4fdba1" />
       </PostImages>
+
+      {/* 좋아요, 댓글 */}
       <PostInfo>
         <PostIcons>
           <PostSvg fill="" width={24} height={24}>
@@ -154,6 +162,7 @@ const PostBox = () => {
           <FaRegBookmark size={24} />
         </PostIcon>
       </PostInfo>
+
       <PostMain>
         <PostLike>좋아요 390개</PostLike>
         <PostTitle>

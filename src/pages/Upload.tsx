@@ -144,13 +144,40 @@ const Upload = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit: SubmitHandler<IFormInput> = async (data) => {
-    console.log(JSON.stringify(imgPreviews));
+    console.log(data.images);
     console.log(data.description);
     console.log(userInfo);
     try {
       setIsLoading(true);
+
+      // img supabase stoarge에 업로드
+      const imgFiles = Array.from(data.images);
+      console.log("imgFiles : ", imgFiles);
+
+      const imageUrls = [];
+      for (const file of imgFiles) {
+        const { data, error } = await supabase.storage
+          .from("posts_images")
+          .upload(`uploads/${file.name}`, file);
+
+        console.log(data);
+
+        if (error) {
+          console.error(error);
+          continue;
+        }
+
+        const publicUrl = supabase.storage
+          .from("posts_images")
+          .getPublicUrl(`uploads/${file.name}`).data.publicUrl;
+
+        console.log(publicUrl);
+        imageUrls.push(publicUrl);
+      }
+
+      // post 정보 데이터베이스에 저장
       const { error } = await supabase.from("Posts").insert({
-        image_URL: JSON.stringify(imgPreviews),
+        image_URL: JSON.stringify(imageUrls),
         description: data.description,
         nickname: userInfo.nickname,
       });
