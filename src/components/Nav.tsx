@@ -2,7 +2,9 @@ import styled from "styled-components";
 import { IoHomeSharp, IoHomeOutline } from "react-icons/io5";
 import { HiMiniMagnifyingGlass } from "react-icons/hi2";
 import { AiOutlineMessage } from "react-icons/ai";
-import { FiMenu } from "react-icons/fi";
+import { FiMenu, FiSun } from "react-icons/fi";
+import { useState } from "react";
+import supabase from "../supabaseClient";
 
 const Wrapper = styled.nav`
   width: 335px;
@@ -61,7 +63,38 @@ const UserIcon = styled.div`
 
 const More = styled.ul``;
 
+const MoreBox = styled.ul`
+  position: absolute;
+  bottom: 80px;
+  margin-left: 5px;
+  border-radius: 15px;
+  box-shadow: 0px 0px 10px #b1b1b1;
+  width: 270px;
+  /* height: 200px; */
+  background-color: #fff;
+  padding: 5px 10px;
+`;
+
+const MoreBoxItem = styled(NavItem)`
+  font-size: 14px;
+  gap: 10px;
+`;
+
 const Nav = () => {
+  const [moreOpen, setMoreOpen] = useState(false);
+
+  const handleMoreClick = () => {
+    setMoreOpen((prev) => !prev);
+  };
+
+  const logOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.log(error);
+      alert("알 수 없는 오류가 발생했습니다.");
+    }
+  };
+
   return (
     <Wrapper>
       <TopItem>
@@ -92,13 +125,24 @@ const Nav = () => {
         </NavItems>
       </TopItem>
       <More>
-        <NavItem>
+        <NavItem onClick={handleMoreClick}>
           <ItemIcon>
             <FiMenu size={30} />
           </ItemIcon>
           <ItemName>더 보기</ItemName>
         </NavItem>
       </More>
+      {moreOpen ? (
+        <MoreBox>
+          <MoreBoxItem>
+            <ItemIcon>
+              <FiSun />
+            </ItemIcon>
+            <ItemName>모드 전환</ItemName>
+          </MoreBoxItem>
+          <MoreBoxItem onClick={logOut}>로그아웃</MoreBoxItem>
+        </MoreBox>
+      ) : null}
     </Wrapper>
   );
 };

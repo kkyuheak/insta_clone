@@ -173,9 +173,11 @@ const LoginPage = () => {
 
       if (data.user) {
         const { nickname, email } = data.user.user_metadata;
+        const { id } = data.user;
         setUserAtom({
           nickname,
           email,
+          id,
         });
       }
 

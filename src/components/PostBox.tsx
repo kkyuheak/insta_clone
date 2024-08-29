@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { MdMoreHoriz } from "react-icons/md";
 import { HiOutlineShare } from "react-icons/hi2";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
+import { IPostData } from "../pages/Home";
 
 const Wrapper = styled.article`
   margin: 0 auto;
@@ -120,13 +121,20 @@ const PostComments = styled.p`
   font-weight: 600;
   cursor: pointer;
 `;
-const PostBox = () => {
+
+interface IPostBoxProps {
+  postData: IPostData;
+}
+const PostBox = ({ postData }: IPostBoxProps) => {
+  const imgSrc = JSON.parse(postData.image_URL);
+  console.log(imgSrc[0]);
+
   return (
     <Wrapper>
       <PostHeader>
         <UserInfo>
           <UserIcon />
-          <UserName>토심이</UserName>
+          <UserName>{postData.nickname}</UserName>
           <PostDate>•1일</PostDate>
         </UserInfo>
         <PostMenu>
@@ -136,7 +144,7 @@ const PostBox = () => {
 
       {/* 사진 */}
       <PostImages>
-        <PostImg $src="blob:http://localhost:5173/16c67ff4-0522-4460-9448-04073c4fdba1" />
+        <PostImg $src={imgSrc[0]} />
       </PostImages>
 
       {/* 좋아요, 댓글 */}
@@ -166,8 +174,8 @@ const PostBox = () => {
       <PostMain>
         <PostLike>좋아요 390개</PostLike>
         <PostTitle>
-          <UserName>토심이</UserName>
-          <PostDes>안경을 구매하세요~!</PostDes>
+          <UserName>{postData.nickname}</UserName>
+          <PostDes>{postData.description}</PostDes>
         </PostTitle>
         <PostComments>댓글 27개 모두 보기</PostComments>
       </PostMain>

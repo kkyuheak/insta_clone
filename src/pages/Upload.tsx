@@ -158,18 +158,19 @@ const Upload = () => {
       for (const file of imgFiles) {
         const { data, error } = await supabase.storage
           .from("posts_images")
-          .upload(`uploads/${file.name}`, file);
+          .upload(`uploads/${userInfo.id}/${file.name}`, file);
 
         console.log(data);
 
         if (error) {
           console.error(error);
-          continue;
+          alert("알 수 없는 오류가 발생했습니다.");
+          return;
         }
 
         const publicUrl = supabase.storage
           .from("posts_images")
-          .getPublicUrl(`uploads/${file.name}`).data.publicUrl;
+          .getPublicUrl(`uploads/${userInfo.id}/${file.name}`).data.publicUrl;
 
         console.log(publicUrl);
         imageUrls.push(publicUrl);
@@ -179,6 +180,7 @@ const Upload = () => {
       const { error } = await supabase.from("Posts").insert({
         image_URL: JSON.stringify(imageUrls),
         description: data.description,
+        user_id: userInfo.id,
         nickname: userInfo.nickname,
       });
       navigate("/");

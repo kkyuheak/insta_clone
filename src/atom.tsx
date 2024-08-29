@@ -6,11 +6,18 @@ const { persistAtom } = recoilPersist({
   storage: sessionStorage,
 });
 
-export const UserAtom = atom({
+interface UserInfo {
+  nickname: string;
+  email: string;
+  id: string;
+}
+
+export const UserAtom = atom<UserInfo>({
   key: "userinfo",
   default: {
     nickname: "",
     email: "",
+    id: "",
   },
   effects_UNSTABLE: [persistAtom],
 });

@@ -5,15 +5,26 @@ import Nav from "../components/Nav";
 import UploadBtn from "../components/UploadBtn";
 import styled from "styled-components";
 import supabase from "../supabaseClient";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Wrapper = styled.div`
   position: relative;
 `;
 
+export interface IPostData {
+  id: number;
+  image_URL: string;
+  description: string;
+  nickname: string;
+  user_id: string;
+  created_at: Date;
+}
+
 const Home = () => {
   const userinfo = useRecoilValue(UserAtom);
   console.log(userinfo);
+
+  const [postData, setPostData] = useState<IPostData[]>([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -28,8 +39,9 @@ const Home = () => {
         }
 
         if (isMounted) {
+          setPostData(data.reverse());
           console.log(data);
-          // console.log(JSON.parse(data[0].image_URL));
+          console.log(JSON.parse(data[0].image_URL));
         }
       } catch (err) {
         console.log(err);
@@ -46,9 +58,12 @@ const Home = () => {
   return (
     <Wrapper>
       <Nav />
+      {postData
+        ? postData.map((data) => <PostBox postData={data} key={data.id} />)
+        : null}
+      {/* <PostBox />
       <PostBox />
-      <PostBox />
-      <PostBox />
+      <PostBox /> */}
       <UploadBtn />
     </Wrapper>
   );
