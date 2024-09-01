@@ -186,9 +186,11 @@ const PostBox = ({ postData }: IPostBoxProps) => {
         return;
       }
     } else {
+      const deleteArr = postData.like.filter((user) => user !== userInfo.id);
+
       const { error } = await supabase
         .from("Posts")
-        .update({ like: [] })
+        .update({ like: deleteArr })
         .eq("id", postData.id);
 
       if (error) {
