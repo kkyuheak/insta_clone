@@ -18,6 +18,7 @@ export interface IPostData {
   nickname: string;
   user_id: string;
   created_at: Date;
+  like: string[];
 }
 
 const Home = () => {
