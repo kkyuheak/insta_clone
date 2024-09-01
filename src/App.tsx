@@ -30,7 +30,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/upload",
-    element: userinfo ? <Upload /> : null,
+    element: userinfo ? <Upload /> : <LoginPage />,
   },
 ]);
 

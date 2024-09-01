@@ -127,6 +127,9 @@ const loadingVariants: Variants = {
 };
 
 const Upload = () => {
+  // storage 업로드 날짜 경로
+  const nowDate = Date.now();
+
   const navigate = useNavigate();
   const userInfo = useRecoilValue(UserAtom);
 
@@ -158,7 +161,7 @@ const Upload = () => {
       for (const file of imgFiles) {
         const { data, error } = await supabase.storage
           .from("posts_images")
-          .upload(`uploads/${userInfo.id}/${file.name}`, file);
+          .upload(`uploads/${userInfo.id}/${nowDate}/${file.name}`, file);
 
         console.log(data);
 
@@ -170,7 +173,8 @@ const Upload = () => {
 
         const publicUrl = supabase.storage
           .from("posts_images")
-          .getPublicUrl(`uploads/${userInfo.id}/${file.name}`).data.publicUrl;
+          .getPublicUrl(`uploads/${userInfo.id}/${nowDate}/${file.name}`)
+          .data.publicUrl;
 
         console.log(publicUrl);
         imageUrls.push(publicUrl);

@@ -3,12 +3,20 @@ import { MdMoreHoriz } from "react-icons/md";
 import { HiOutlineShare } from "react-icons/hi2";
 import { FaBookmark, FaRegBookmark } from "react-icons/fa";
 import { IPostData } from "../pages/Home";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { Navigation, Pagination } from "swiper/modules";
 
 const Wrapper = styled.article`
   margin: 0 auto;
   width: 470px;
   height: 820px;
   padding: 10px;
+  box-shadow: 0px 0px 10px #b5b5b5;
+  border-radius: 10px;
+  margin-top: 5px;
 
   &::after {
     content: "";
@@ -68,7 +76,7 @@ const PostImg = styled.div<{ $src: string }>`
   background-repeat: no-repeat;
   background-size: contain;
   width: 100%;
-  height: 585px;
+  height: 560px;
   border-radius: 5px;
 `;
 const PostInfo = styled.div`
@@ -125,9 +133,27 @@ const PostComments = styled.p`
 interface IPostBoxProps {
   postData: IPostData;
 }
+
+const SwiperStyle = styled(Swiper)`
+  .swiper-button-next,
+  .swiper-button-prev {
+    color: black;
+    background-color: rgba(255, 255, 255, 0.8);
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+  }
+
+  .swiper-button-next::after {
+    font-size: 15px;
+  }
+
+  .swiper-button-prev::after {
+    font-size: 15px;
+  }
+`;
 const PostBox = ({ postData }: IPostBoxProps) => {
-  const imgSrc = JSON.parse(postData.image_URL);
-  console.log(imgSrc[0]);
+  const imgSrc: string[] = JSON.parse(postData.image_URL);
 
   return (
     <Wrapper>
@@ -144,7 +170,19 @@ const PostBox = ({ postData }: IPostBoxProps) => {
 
       {/* 사진 */}
       <PostImages>
-        <PostImg $src={imgSrc[0]} />
+        <SwiperStyle
+          modules={[Navigation, Pagination]}
+          navigation
+          pagination={{ clickable: true }}
+        >
+          {imgSrc.map((src, i) => {
+            return (
+              <SwiperSlide key={i}>
+                <PostImg $src={src} />
+              </SwiperSlide>
+            );
+          })}
+        </SwiperStyle>
       </PostImages>
 
       {/* 좋아요, 댓글 */}

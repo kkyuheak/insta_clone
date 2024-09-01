@@ -41,7 +41,6 @@ const Home = () => {
         if (isMounted) {
           setPostData(data.reverse());
           console.log(data);
-          console.log(JSON.parse(data[0].image_URL));
         }
       } catch (err) {
         console.log(err);

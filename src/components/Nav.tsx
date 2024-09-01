@@ -3,8 +3,10 @@ import { IoHomeSharp, IoHomeOutline } from "react-icons/io5";
 import { HiMiniMagnifyingGlass } from "react-icons/hi2";
 import { AiOutlineMessage } from "react-icons/ai";
 import { FiMenu, FiSun } from "react-icons/fi";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import supabase from "../supabaseClient";
+import { useRecoilValue } from "recoil";
+import { UserAtom } from "../atom";
 
 const Wrapper = styled.nav`
   width: 335px;
@@ -81,9 +83,12 @@ const MoreBoxItem = styled(NavItem)`
 `;
 
 const Nav = () => {
+  const userInfo = useRecoilValue(UserAtom);
+
   const [moreOpen, setMoreOpen] = useState(false);
 
-  const handleMoreClick = () => {
+  const handleMoreClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setMoreOpen((prev) => !prev);
   };
 
@@ -93,7 +98,21 @@ const Nav = () => {
       console.log(error);
       alert("알 수 없는 오류가 발생했습니다.");
     }
+    sessionStorage.removeItem("user");
+    window.location.reload();
   };
+
+  useEffect(() => {
+    window.addEventListener("click", () => {
+      setMoreOpen(false);
+    });
+
+    return () => {
+      window.removeEventListener("click", () => {
+        setMoreOpen(false);
+      });
+    };
+  }, []);
 
   return (
     <Wrapper>
@@ -120,7 +139,7 @@ const Nav = () => {
           </NavItem>
           <NavItem>
             <UserIcon></UserIcon>
-            <ItemName>프로필</ItemName>
+            <ItemName>{userInfo.nickname}</ItemName>
           </NavItem>
         </NavItems>
       </TopItem>
@@ -133,7 +152,11 @@ const Nav = () => {
         </NavItem>
       </More>
       {moreOpen ? (
-        <MoreBox>
+        <MoreBox
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+          }}
+        >
           <MoreBoxItem>
             <ItemIcon>
               <FiSun />
