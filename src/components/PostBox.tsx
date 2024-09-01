@@ -175,12 +175,10 @@ const PostBox = ({ postData }: IPostBoxProps) => {
 
   const likeClick = async (likePost: boolean) => {
     if (!likePost) {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("Posts")
-        .update({ like: [userInfo.id] })
+        .update({ like: [...postData.like, userInfo.id] })
         .eq("id", postData.id);
-
-      console.log(data);
 
       if (error) {
         console.error(error);
@@ -188,12 +186,10 @@ const PostBox = ({ postData }: IPostBoxProps) => {
         return;
       }
     } else {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("Posts")
         .update({ like: [] })
         .eq("id", postData.id);
-
-      console.log(data);
 
       if (error) {
         console.error(error);
