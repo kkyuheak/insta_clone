@@ -32,7 +32,10 @@ const Home = () => {
 
     const getPostsData = async () => {
       try {
-        const { data, error } = await supabase.from("Posts").select("*");
+        const { data, error } = await supabase
+          .from("Posts")
+          .select("*")
+          .order("created_at", { ascending: false });
 
         if (error) {
           console.error(error.message);
@@ -40,7 +43,7 @@ const Home = () => {
         }
 
         if (isMounted) {
-          setPostData(data.reverse());
+          setPostData(data);
           console.log(data);
         }
       } catch (err) {
@@ -61,9 +64,6 @@ const Home = () => {
       {postData
         ? postData.map((data) => <PostBox postData={data} key={data.id} />)
         : null}
-      {/* <PostBox />
-      <PostBox />
-      <PostBox /> */}
       <UploadBtn />
     </Wrapper>
   );

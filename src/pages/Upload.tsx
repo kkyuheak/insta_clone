@@ -186,6 +186,7 @@ const Upload = () => {
         description: data.description,
         user_id: userInfo.id,
         nickname: userInfo.nickname,
+        like: [],
       });
       navigate("/");
 

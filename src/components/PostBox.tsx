@@ -157,6 +157,7 @@ const SwiperStyle = styled(Swiper)`
   }
 `;
 const PostBox = ({ postData }: IPostBoxProps) => {
+  // const [fakeHeart, setFakeHeart] = useState(false);
   const [likePost, setLikePost] = useState(false);
 
   const userInfo = useRecoilValue(UserAtom);
@@ -166,7 +167,6 @@ const PostBox = ({ postData }: IPostBoxProps) => {
   useEffect(() => {
     if (postData.like) {
       const isLike = postData.like.includes(userInfo.id);
-      console.log(postData.id, isLike);
       if (isLike) {
         setLikePost(true);
       }
@@ -185,6 +185,7 @@ const PostBox = ({ postData }: IPostBoxProps) => {
         alert("알 수 없는 오류가 발생했습니다.");
         return;
       }
+      setLikePost(true);
     } else {
       const deleteArr = postData.like.filter((user) => user !== userInfo.id);
 
@@ -198,6 +199,7 @@ const PostBox = ({ postData }: IPostBoxProps) => {
         alert("알 수 없는 오류가 발생했습니다.");
         return;
       }
+      setLikePost(false);
     }
   };
 
