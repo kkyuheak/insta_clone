@@ -157,7 +157,10 @@ const SwiperStyle = styled(Swiper)`
   }
 `;
 const PostBox = ({ postData }: IPostBoxProps) => {
-  // const [fakeHeart, setFakeHeart] = useState(false);
+  // 좋아요 갯수
+  const [heartNum, setHeartNum] = useState<number>(0);
+
+  // 좋아요 버튼
   const [likePost, setLikePost] = useState(false);
 
   const userInfo = useRecoilValue(UserAtom);
@@ -171,8 +174,12 @@ const PostBox = ({ postData }: IPostBoxProps) => {
         setLikePost(true);
       }
     }
+    if (postData) {
+      setHeartNum(postData.like.length);
+    }
   }, []);
 
+  // 좋아요 버튼 클릭
   const likeClick = async (likePost: boolean) => {
     if (!likePost) {
       const { error } = await supabase
@@ -186,6 +193,7 @@ const PostBox = ({ postData }: IPostBoxProps) => {
         return;
       }
       setLikePost(true);
+      setHeartNum((prev) => prev + 1);
     } else {
       const deleteArr = postData.like.filter((user) => user !== userInfo.id);
 
@@ -200,6 +208,7 @@ const PostBox = ({ postData }: IPostBoxProps) => {
         return;
       }
       setLikePost(false);
+      setHeartNum((prev) => prev - 1);
     }
   };
 
@@ -273,7 +282,7 @@ const PostBox = ({ postData }: IPostBoxProps) => {
       </PostInfo>
 
       <PostMain>
-        <PostLike>좋아요 390개</PostLike>
+        <PostLike>좋아요 {heartNum}개</PostLike>
         <PostTitle>
           <UserName>{postData.nickname}</UserName>
           <PostDes>{postData.description}</PostDes>
