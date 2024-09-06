@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import supabase from "../supabaseClient";
 import { useRecoilValue } from "recoil";
 import { UserAtom } from "../atom";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.nav`
   width: 335px;
@@ -18,6 +19,16 @@ const Wrapper = styled.nav`
   border-right: 1px solid #d0d0d0;
   position: fixed;
   background-color: #fff;
+
+  @media screen and (max-width: 1440px) {
+    width: 250px;
+  }
+
+  @media screen and (max-width: 1250px) {
+    width: 70px;
+    padding: 5px;
+    /* align-items: center; */
+  }
 `;
 
 const TopItem = styled.div``;
@@ -31,6 +42,10 @@ const NavLogo = styled.div`
   align-items: center;
   padding: 0 10px;
   cursor: pointer;
+
+  @media screen and (max-width: 1250px) {
+    display: none;
+  }
 `;
 
 const NavItems = styled.ul``;
@@ -50,17 +65,25 @@ const NavItem = styled.li`
     background-color: rgba(0, 0, 0, 0.1);
     transition: all 0.3s;
   }
+
+  @media screen and (max-width: 1250px) {
+    justify-content: center;
+    padding: 0;
+  }
 `;
 
 const ItemIcon = styled.span``;
 
-const ItemName = styled.p``;
+const ItemName = styled.p`
+  @media screen and (max-width: 1250px) {
+    display: none;
+  }
+`;
 
-const UserIcon = styled.div`
-  width: 30px;
-  height: 30px;
+const UserIcon = styled.img`
+  width: 33px;
+  height: 33px;
   border-radius: 50%;
-  background-color: #000;
 `;
 
 const More = styled.ul``;
@@ -72,17 +95,25 @@ const MoreBox = styled.ul`
   border-radius: 15px;
   box-shadow: 0px 0px 10px #b1b1b1;
   width: 270px;
-  /* height: 200px; */
   background-color: #fff;
   padding: 5px 10px;
+
+  @media screen and (max-width: 1250px) {
+    width: 150px;
+  }
 `;
 
 const MoreBoxItem = styled(NavItem)`
   font-size: 14px;
   gap: 10px;
+
+  @media screen and (max-width: 1250px) {
+  }
 `;
 
 const Nav = () => {
+  const navigate = useNavigate();
+
   const userInfo = useRecoilValue(UserAtom);
 
   const [moreOpen, setMoreOpen] = useState(false);
@@ -114,6 +145,10 @@ const Nav = () => {
     };
   }, []);
 
+  const profileClick = () => {
+    navigate(`/${userInfo.nickname}`);
+  };
+
   return (
     <Wrapper>
       <TopItem>
@@ -137,8 +172,8 @@ const Nav = () => {
             </ItemIcon>
             <ItemName>메시지</ItemName>
           </NavItem>
-          <NavItem>
-            <UserIcon></UserIcon>
+          <NavItem onClick={profileClick}>
+            <UserIcon src="/images/userIcon.png" />
             <ItemName>{userInfo.nickname}</ItemName>
           </NavItem>
         </NavItems>

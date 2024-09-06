@@ -16,11 +16,11 @@ import { useEffect, useState } from "react";
 const Wrapper = styled.article`
   margin: 0 auto;
   width: 470px;
-  height: 820px;
+  /* height: 820px; */
   padding: 10px;
   box-shadow: 0px 0px 10px #b5b5b5;
   border-radius: 10px;
-  margin-top: 5px;
+  margin-top: 10px;
 
   &::after {
     content: "";
@@ -29,6 +29,10 @@ const Wrapper = styled.article`
     height: 1px;
     background-color: #d0d0d0;
     margin-top: 25px;
+  }
+
+  @media screen and (max-width: 1250px) {
+    width: 350px;
   }
 `;
 

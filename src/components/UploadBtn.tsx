@@ -7,8 +7,8 @@ const Wrapper = styled.div`
   border-radius: 50%;
   background-color: rgb(240, 0, 195);
   position: fixed;
-  bottom: 15px;
-  right: 15px;
+  bottom: 20px;
+  right: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
