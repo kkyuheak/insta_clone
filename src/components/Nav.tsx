@@ -152,9 +152,9 @@ const Nav = () => {
   return (
     <Wrapper>
       <TopItem>
-        <NavLogo>instagram</NavLogo>
+        <NavLogo onClick={() => navigate("/")}>instagram</NavLogo>
         <NavItems>
-          <NavItem>
+          <NavItem onClick={() => navigate("/")}>
             <ItemIcon>
               <IoHomeSharp size={30} />
             </ItemIcon>

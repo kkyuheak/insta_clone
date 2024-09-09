@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { createGlobalStyle } from "styled-components";
 import { RecoilRoot } from "recoil";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 export const GlobalStyle = createGlobalStyle`
   html, body, div, span, applet, object, iframe,
@@ -56,11 +57,15 @@ export const GlobalStyle = createGlobalStyle`
   }
 `;
 
+const queryClient = new QueryClient();
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RecoilRoot>
-      <GlobalStyle />
-      <App />
-    </RecoilRoot>
+    <QueryClientProvider client={queryClient}>
+      <RecoilRoot>
+        <GlobalStyle />
+        <App />
+      </RecoilRoot>
+    </QueryClientProvider>
   </React.StrictMode>
 );

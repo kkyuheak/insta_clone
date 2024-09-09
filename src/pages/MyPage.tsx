@@ -2,8 +2,12 @@ import styled from "styled-components";
 import Nav from "../components/Nav";
 import { useRecoilValue } from "recoil";
 import { UserAtom } from "../atom";
-import { useLocation, useMatch, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getMyData } from "../utility/getMyData";
+import MyPost from "../components/myPage/MyPost";
+import { IPostData } from "./Home";
 
 const Container = styled.div`
   width: calc(100vw - 335px);
@@ -11,7 +15,7 @@ const Container = styled.div`
 `;
 
 const Main = styled.div`
-  width: 900px;
+  width: 910px;
   height: 100vh;
   margin: 0 auto;
 `;
@@ -69,12 +73,21 @@ const Button = styled.li<{ $isTrue?: boolean }>`
   width: 50px;
   height: 40px;
   font-size: 14px;
-  border-top: ${(props) => (props.$isTrue ? "1px solid #000" : "")};
+  border-top: ${(props) => (props.$isTrue ? "2px solid #000" : "")};
   display: flex;
   justify-content: center;
   align-items: center;
 
   cursor: pointer;
+`;
+
+const MyPosts = styled.div`
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 300px);
+  gap: 5px;
+  margin-top: 10px;
 `;
 
 const MyPage = () => {
@@ -85,6 +98,13 @@ const MyPage = () => {
   const [locationSaved, setLocationSaved] = useState(false);
 
   const location = useLocation();
+
+  // 유저 post 데이터 가져오기
+  const { data, isLoading } = useQuery({
+    queryKey: ["my_data"],
+    queryFn: () => getMyData({ userName: userinfo.nickname }),
+  });
+  console.log(isLoading, data);
 
   useEffect(() => {
     if (location.pathname.includes("/saved")) {
@@ -104,7 +124,7 @@ const MyPage = () => {
             <UserInfo>
               <UserName>{userinfo.nickname}</UserName>
               <UserData>
-                <UserPost>게시물 0</UserPost>
+                <UserPost>게시물 {data?.length}</UserPost>
                 <UserPost>팔로워 0</UserPost>
                 <UserPost>팔로우 0</UserPost>
               </UserData>
@@ -127,6 +147,13 @@ const MyPage = () => {
               </Button>
             </Buttons>
           </Posts>
+
+          {/* 내 게시글 */}
+          <MyPosts>
+            {data?.map((postInfo: IPostData) => {
+              return <MyPost {...postInfo} key={postInfo.id}></MyPost>;
+            })}
+          </MyPosts>
         </Main>
       </Container>
     </>
