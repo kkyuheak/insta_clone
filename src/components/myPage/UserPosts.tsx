@@ -1,10 +1,7 @@
 import styled from "styled-components";
 import MyPost from "./MyPost";
 import { IPostData } from "../../pages/Home";
-import { useQuery } from "@tanstack/react-query";
-import { getMyData } from "../../utility/getMyData";
-import { UserAtom } from "../../atom";
-import { useRecoilValue } from "recoil";
+import { useOutletContext } from "react-router-dom";
 
 const MyPosts = styled.div`
   width: 100%;
@@ -15,18 +12,12 @@ const MyPosts = styled.div`
 `;
 
 const UserPosts = () => {
-  const userinfo = useRecoilValue(UserAtom);
-
-  // 유저 post 데이터 가져오기
-  const { data, isLoading } = useQuery({
-    queryKey: ["my_data"],
-    queryFn: () => getMyData({ userName: userinfo.nickname }),
-  });
-  console.log(isLoading, data);
+  const myPostData: IPostData[] = useOutletContext();
+  console.log(myPostData);
 
   return (
     <MyPosts>
-      {data?.map((postInfo: IPostData) => {
+      {myPostData?.map((postInfo: IPostData) => {
         return <MyPost {...postInfo} key={postInfo.id}></MyPost>;
       })}
     </MyPosts>
