@@ -2,12 +2,10 @@ import styled from "styled-components";
 import Nav from "../components/Nav";
 import { useRecoilValue } from "recoil";
 import { UserAtom } from "../atom";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getMyData } from "../utility/getMyData";
-import MyPost from "../components/myPage/MyPost";
-import { IPostData } from "./Home";
 
 const Container = styled.div`
   width: calc(100vw - 335px);
@@ -15,7 +13,7 @@ const Container = styled.div`
 `;
 
 const Main = styled.div`
-  width: 910px;
+  width: 920px;
   height: 100vh;
   margin: 0 auto;
 `;
@@ -81,15 +79,6 @@ const Button = styled.li<{ $isTrue?: boolean }>`
   cursor: pointer;
 `;
 
-const MyPosts = styled.div`
-  width: 100%;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: repeat(3, 300px);
-  gap: 5px;
-  margin-top: 10px;
-`;
-
 const MyPage = () => {
   const navigate = useNavigate();
 
@@ -100,11 +89,11 @@ const MyPage = () => {
   const location = useLocation();
 
   // 유저 post 데이터 가져오기
-  const { data, isLoading } = useQuery({
+  const { data: myPostData, isLoading } = useQuery({
     queryKey: ["my_data"],
     queryFn: () => getMyData({ userName: userinfo.nickname }),
   });
-  console.log(isLoading, data);
+  console.log(isLoading, myPostData);
 
   useEffect(() => {
     if (location.pathname.includes("/saved")) {
@@ -124,7 +113,7 @@ const MyPage = () => {
             <UserInfo>
               <UserName>{userinfo.nickname}</UserName>
               <UserData>
-                <UserPost>게시물 {data?.length}</UserPost>
+                <UserPost>게시물 {myPostData?.length}</UserPost>
                 <UserPost>팔로워 0</UserPost>
                 <UserPost>팔로우 0</UserPost>
               </UserData>
@@ -134,7 +123,7 @@ const MyPage = () => {
           <Posts>
             <Buttons>
               <Button
-                onClick={() => navigate(`/${userinfo.nickname}`)}
+                onClick={() => navigate(`/${userinfo.nickname}/posts`)}
                 $isTrue={!locationSaved}
               >
                 게시물
@@ -148,12 +137,7 @@ const MyPage = () => {
             </Buttons>
           </Posts>
 
-          {/* 내 게시글 */}
-          <MyPosts>
-            {data?.map((postInfo: IPostData) => {
-              return <MyPost {...postInfo} key={postInfo.id}></MyPost>;
-            })}
-          </MyPosts>
+          <Outlet context={myPostData} />
         </Main>
       </Container>
     </>

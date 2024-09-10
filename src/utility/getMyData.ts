@@ -5,7 +5,7 @@ interface IMyDataProps {
 }
 
 export const getMyData = async ({ userName }: IMyDataProps) => {
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("Posts")
     .select("*")
     .eq("nickname", userName)

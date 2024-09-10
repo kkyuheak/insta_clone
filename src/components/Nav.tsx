@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { IoHomeSharp, IoHomeOutline } from "react-icons/io5";
+import { IoHomeSharp } from "react-icons/io5";
 import { HiMiniMagnifyingGlass } from "react-icons/hi2";
 import { AiOutlineMessage } from "react-icons/ai";
 import { FiMenu, FiSun } from "react-icons/fi";
@@ -146,7 +146,7 @@ const Nav = () => {
   }, []);
 
   const profileClick = () => {
-    navigate(`/${userInfo.nickname}`);
+    navigate(`/${userInfo.nickname}/posts`);
   };
 
   return (

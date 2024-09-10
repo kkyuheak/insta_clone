@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { MdMoreHoriz } from "react-icons/md";
 import { HiOutlineShare } from "react-icons/hi2";
-import { FaBookmark, FaRegBookmark } from "react-icons/fa";
+import { FaRegBookmark } from "react-icons/fa";
 import { IPostData } from "../pages/Home";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
