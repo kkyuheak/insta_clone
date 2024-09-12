@@ -24,16 +24,25 @@ const Thumbnail = styled.img`
 const MyPost = (postInfo: IPostData) => {
   const [detailOpen, setDetailOpen] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent) => {
     setDetailOpen(true);
+    e.stopPropagation();
   };
+
+  const closeDetail = () => {
+    setDetailOpen(false);
+  };
+
   return (
-    <Wrapper onClick={handleClick}>
+    <Wrapper>
       <Thumbnail
         src={JSON.parse(postInfo.image_URL)[0]}
         alt="유저 게시글 이미지"
+        onClick={handleClick}
       />
-      {detailOpen && <DetailPost {...postInfo} />}
+      {detailOpen && (
+        <DetailPost postInfo={postInfo} setDetailOpen={closeDetail} />
+      )}
     </Wrapper>
   );
 };
