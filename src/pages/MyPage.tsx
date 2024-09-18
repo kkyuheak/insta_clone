@@ -1,11 +1,10 @@
 import styled from "styled-components";
 import Nav from "../components/Nav";
-import { useRecoilValue } from "recoil";
-import { UserAtom } from "../atom";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getMyData } from "../utility/getMyData";
+import { getUserInfo } from "../utility/getUserInfo";
 
 const Container = styled.div`
   width: calc(100vw - 335px);
@@ -82,18 +81,28 @@ const Button = styled.li<{ $isTrue?: boolean }>`
 const MyPage = () => {
   const navigate = useNavigate();
 
-  const userinfo = useRecoilValue(UserAtom);
-
   const [locationSaved, setLocationSaved] = useState(false);
+
+  const { userId } = useParams();
+  console.log(decodeURI(decodeURIComponent(userId!)));
 
   const location = useLocation();
 
-  // 유저 post 데이터 가져오기
-  const { data: myPostData, isLoading } = useQuery({
-    queryKey: ["my_data"],
-    queryFn: () => getMyData({ userName: userinfo.nickname }),
+  // 유저 정보 가져오기
+  const { data: userInfo, isLoading: userInfoLoading } = useQuery({
+    queryKey: ["userInfo"],
+    queryFn: () =>
+      getUserInfo({ userName: decodeURI(decodeURIComponent(userId!)) }),
   });
-  console.log(isLoading, myPostData);
+  console.log("userInfo:", userInfo, userInfoLoading);
+
+  // 유저 post 데이터 가져오기
+  const { data: myPostData, isLoading: myPostDataLoading } = useQuery({
+    queryKey: ["my_data"],
+    queryFn: () =>
+      getMyData({ userName: decodeURI(decodeURIComponent(userId!)) }),
+  });
+  console.log(myPostDataLoading, myPostData);
 
   useEffect(() => {
     if (location.pathname.includes("/saved")) {
@@ -111,7 +120,7 @@ const MyPage = () => {
           <Header>
             <UserImg src="/images/userIcon.png" alt="유저 이미지" />
             <UserInfo>
-              <UserName>{userinfo.nickname}</UserName>
+              <UserName>{userInfo && userInfo[0].nickname}</UserName>
               <UserData>
                 <UserPost>게시물 {myPostData?.length}</UserPost>
                 <UserPost>팔로워 0</UserPost>
@@ -123,13 +132,17 @@ const MyPage = () => {
           <Posts>
             <Buttons>
               <Button
-                onClick={() => navigate(`/${userinfo.nickname}/posts`)}
+                onClick={() =>
+                  navigate(`/${userInfo && userInfo[0].nickname}/posts`)
+                }
                 $isTrue={!locationSaved}
               >
                 게시물
               </Button>
               <Button
-                onClick={() => navigate(`/${userinfo.nickname}/saved`)}
+                onClick={() =>
+                  navigate(`/${userInfo && userInfo[0].nickname}/saved`)
+                }
                 $isTrue={locationSaved}
               >
                 저장됨

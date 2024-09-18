@@ -12,6 +12,7 @@ import supabase from "../supabaseClient";
 import { useRecoilValue } from "recoil";
 import { UserAtom } from "../atom";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.article`
   margin: 0 auto;
@@ -161,6 +162,8 @@ const SwiperStyle = styled(Swiper)`
   }
 `;
 const PostBox = ({ postData }: IPostBoxProps) => {
+  const navigate = useNavigate();
+
   // 좋아요 갯수
   const [heartNum, setHeartNum] = useState<number>(0);
 
@@ -219,7 +222,7 @@ const PostBox = ({ postData }: IPostBoxProps) => {
   return (
     <Wrapper>
       <PostHeader>
-        <UserInfo>
+        <UserInfo onClick={() => navigate(`/${postData.nickname}/posts`)}>
           <UserIcon />
           <UserName>{postData.nickname}</UserName>
           <PostDate>•1일</PostDate>
