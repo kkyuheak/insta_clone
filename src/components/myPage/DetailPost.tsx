@@ -155,7 +155,7 @@ const DetailPost = ({ postInfo, setDetailOpen }: IDetailPostProps) => {
     });
 
     return () => {
-      window.addEventListener("wheel", (e) => e.preventDefault());
+      window.removeEventListener("wheel", (e) => e.preventDefault());
     };
   }, []);
 

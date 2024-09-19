@@ -84,23 +84,22 @@ const MyPage = () => {
   const [locationSaved, setLocationSaved] = useState(false);
 
   const { userId } = useParams();
-  console.log(decodeURI(decodeURIComponent(userId!)));
+  console.log(decodeURIComponent(userId!));
+  const decUrl = userId ? decodeURIComponent(userId) : "";
 
   const location = useLocation();
 
   // 유저 정보 가져오기
   const { data: userInfo, isLoading: userInfoLoading } = useQuery({
-    queryKey: ["userInfo"],
-    queryFn: () =>
-      getUserInfo({ userName: decodeURI(decodeURIComponent(userId!)) }),
+    queryKey: ["userInfo", userId],
+    queryFn: () => getUserInfo({ userName: decUrl }),
   });
   console.log("userInfo:", userInfo, userInfoLoading);
 
   // 유저 post 데이터 가져오기
   const { data: myPostData, isLoading: myPostDataLoading } = useQuery({
-    queryKey: ["my_data"],
-    queryFn: () =>
-      getMyData({ userName: decodeURI(decodeURIComponent(userId!)) }),
+    queryKey: ["my_data", userId],
+    queryFn: () => getMyData({ userName: decUrl }),
   });
   console.log(myPostDataLoading, myPostData);
 
@@ -132,17 +131,21 @@ const MyPage = () => {
           <Posts>
             <Buttons>
               <Button
-                onClick={() =>
-                  navigate(`/${userInfo && userInfo[0].nickname}/posts`)
-                }
+                onClick={() => {
+                  if (userInfo && userInfo[0].nickname) {
+                    navigate(`/${userInfo[0].nickname}/posts`);
+                  }
+                }}
                 $isTrue={!locationSaved}
               >
                 게시물
               </Button>
               <Button
-                onClick={() =>
-                  navigate(`/${userInfo && userInfo[0].nickname}/saved`)
-                }
+                onClick={() => {
+                  if (userInfo && userInfo[0].nickname) {
+                    navigate(`/${userInfo[0].nickname}/saved`);
+                  }
+                }}
                 $isTrue={locationSaved}
               >
                 저장됨
